@@ -31,24 +31,37 @@ app.get('/:short', function(req, res, next) {
     db.from('urls').select('short', 'url').where('short', short).then((resp) => {
         longURL = (resp[0].url)
     }).then(() => {
-        res.status(302).redirect(longURL);
+        if (longURL) {
+            res.status(302).redirect(longURL);
+        }
+        else {
+            res.status(404);
+        }
     });
 })
 
 app.post('/', function(req, res, next) {
     const url = req.body.shorten;
-    console.log("got shorten request for " + url);
-    const short_url = random.generate({
-        readable: true,
-        length: 6
-    });
 
-    db.table('urls').insert({
-        short: short_url,
-        url: url
-    }).then(() => {
-        res.send(config.url + "/" + short_url + "\n");
-    });
+    if (url) {
+        console.log("got shorten request for " + url);
+
+        const short_url = random.generate({
+            readable: true,
+            length: 6
+        });
+
+        db.table('urls').insert({
+            short: short_url,
+            url: url
+        }).then(() => {
+            res.send(config.url + "/" + short_url + "\n");
+        });
+    }
+
+    else {
+        res.send(`invalid request!`);
+    }
 });
 
 
