@@ -73,4 +73,4 @@ app.post('/', function(req, res, next) {
     }
 });
 
-app.listen(80, () => console.log(`started on port 80`));
+app.listen(80, () => logger.log(`started on port 80`, "ready"));
