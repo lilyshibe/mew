@@ -36,9 +36,13 @@ app.get('/:short', function(req, res, next) {
     }).then(() => {
         res.status(302).redirect(longURL);
     }).catch(() => {
-        res.status(422).send(`<pre>Cannot GET /${short}</pre><style>*{background:black;color:lime;webkit-appearance:none;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`)
+        res.status(422).send(`<pre>
+mew - no-bullshit url shortening
+================================
+
+Cannot GET /${short}</pre><style>*{background:black;color:lime;webkit-appearance:none;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`)
     });
-})
+});
 
 app.post('/', function(req, res, next) {
     const url = req.body.shorten;
