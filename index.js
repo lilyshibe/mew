@@ -17,6 +17,11 @@ require("./database/db.js")(db); // import the database logic
 // variables to be easily accessed.
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// serve files from the /static folder
+if (fs.existsSync(__dirname + "/static")) {
+	app.use(express.static(__dirname + "/static", { dotfiles: "allow" }));
+}
+
 // this is from https://gist.github.com/dperini/729294
 // it's a RegEx for testing if a URL is valid.
 // i do not understand it and i do not pretend to
@@ -196,18 +201,19 @@ http.createServer(app).listen(80, () => {
 	logger.log(`HTTP started on port 80`, "ready");
 });
 
-if(config.usehttps) {
-    https.createServer(
-            {
-                key: fs.readFileSync(config.httpskey),
-                cert: fs.readFileSync(config.httpscert),
-                ca: fs.readFileSync(config.httpsca)
-            },
-            app
-        )
-        .listen(443, () => {
-            logger.log(`HTTPS started on port 443`, "ready");
-        });
+if (config.usehttps) {
+	https
+		.createServer(
+			{
+				key: fs.readFileSync(config.httpskey),
+				cert: fs.readFileSync(config.httpscert),
+				ca: fs.readFileSync(config.httpsca)
+			},
+			app
+		)
+		.listen(443, () => {
+			logger.log(`HTTPS started on port 443`, "ready");
+		});
 }
 
 // app.listen(80, () => logger.log(`started on port 80`, "ready"));
