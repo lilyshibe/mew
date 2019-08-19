@@ -60,7 +60,7 @@ app.post('/', function(req, res, next) {
     }
 
     else {
-        res.send(`invalid request!`);
+        res.send(`invalid request!\n`);
     }
 });
 
