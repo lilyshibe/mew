@@ -201,6 +201,10 @@ app.post("/", function(req, res, next) {
 });
 
 // start up our webpage!
+http.createServer(app).listen(80, () => {
+	logger.log(`HTTP started on port 80`, "ready");
+});
+
 if (config.usehttps) {
 	app.use(function(req, res, next) {
 		if (req.secure) {
@@ -224,10 +228,6 @@ if (config.usehttps) {
 		.listen(443, () => {
 			logger.log(`HTTPS started on port 443`, "ready");
 		});
-} else {
-	http.createServer(app).listen(80, () => {
-		logger.log(`HTTP started on port 80`, "ready");
-	});
 }
 
 // app.listen(80, () => logger.log(`started on port 80`, "ready"));
