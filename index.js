@@ -20,7 +20,7 @@ HTTP POST request to / to shorten a url:
 
 alternatively, put the url here:
 </pre>
-<form><input type="text" name="shorten"><input type="submit" value="shorten"></form>
+<form method="post" action="/"><input type="text" name="shorten"><input type="submit" value="shorten"></form>
 <pre>
 like this site? clone it.
 https://github.com/lilyshibe/mew
