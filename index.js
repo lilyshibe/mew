@@ -6,6 +6,8 @@ const db = require("knex")(config.database);
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const logger = require("./logger.js");
+const https = require("https");
+const http = require("http");
 
 const app = express(); // create the express app
 require("./database/db.js")(db); // import the database logic
@@ -122,13 +124,13 @@ app.post("/", function(req, res, next) {
 	if (url) {
 		// is it a valid url?
 		if (re_weburl.test(url)) {
-            // is it a duplicate?
+			// is it a duplicate?
 			db.from("urls")
 				.select()
 				.where("url", url)
 				.then(resp => {
-                    // url is not a duplicate!
-                    if (!Array.isArray(resp) || !resp.length) {
+					// url is not a duplicate!
+					if (!Array.isArray(resp) || !resp.length) {
 						// log the request in the console
 						logger.log(`shorten request for ${url} from ${req.ip}`);
 
@@ -162,15 +164,15 @@ app.post("/", function(req, res, next) {
 									"warn"
 								);
 							});
-                    }
-                    
-                    // dupe url!
-                    else {
-                        res.send(config.url + "/" + resp[0].short + "\n");
+					}
+
+					// dupe url!
+					else {
+						res.send(config.url + "/" + resp[0].short + "\n");
 						logger.log(
 							`shorten request for ${url} from ${req.ip} was a duplicate`
 						);
-                    }
+					}
 				});
 		}
 
@@ -189,4 +191,23 @@ app.post("/", function(req, res, next) {
 });
 
 // start up our webpage!
-app.listen(80, () => logger.log(`started on port 80`, "ready"));
+
+http.createServer(app).listen(80, () => {
+	logger.log(`HTTP started on port 80`, "ready");
+});
+
+if(config.usehttps) {
+    https.createServer(
+            {
+                key: fs.readFileSync(config.httpskey),
+                cert: fs.readFileSync(config.httpscert),
+                ca: fs.readFileSync(config.httpsca)
+            },
+            app
+        )
+        .listen(443, () => {
+            logger.log(`HTTPS started on port 443`, "ready");
+        });
+}
+
+// app.listen(80, () => logger.log(`started on port 80`, "ready"));

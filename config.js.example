@@ -1,6 +1,13 @@
 module.exports = {
     // the URL to your site
     url: "localhost",
+
+    // https settings
+    usehttps: true,
+
+    httpskey: "path/to/key",
+    httpscert: "path/to/cert",
+    httpsca: "path/to/ca",
     
     // don't fuck with this unless you really know what youre doing
     database: {
