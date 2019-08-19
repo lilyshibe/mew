@@ -12,6 +12,9 @@ const http = require("http");
 const app = express(); // create the express app
 require("./database/db.js")(db); // import the database logic
 
+// this makes the HTTPS redirecting work
+app.enable('trust proxy');
+
 // this is middleware for express that allows POST
 // (the method this app uses for passing information)
 // variables to be easily accessed.
