@@ -1,25 +1,71 @@
 // import the configuration, and node.js libraries
-const config = require('./config.js');
-const express = require('express');
-const random = require('randomstring');
-const db = require('knex')(config.database);
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const logger = require('./logger.js');
+const config = require("./config.js");
+const express = require("express");
+const random = require("randomstring");
+const db = require("knex")(config.database);
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const logger = require("./logger.js");
 
 const app = express(); // create the express app
-require('./database/db.js')(db); // import the database logic
+require("./database/db.js")(db); // import the database logic
 
 // this is middleware for express that allows POST
 // (the method this app uses for passing information)
 // variables to be easily accessed.
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// this is from https://gist.github.com/dperini/729294
+// it's a RegEx for testing if a URL is valid.
+// i do not understand it and i do not pretend to
+var re_weburl = new RegExp(
+	"^" +
+		// protocol identifier (optional)
+		// short syntax // still required
+		"(?:(?:(?:https?|ftp):)?\\/\\/)" +
+		// user:pass BasicAuth (optional)
+		"(?:\\S+(?::\\S*)?@)?" +
+		"(?:" +
+		// IP address exclusion
+		// private & local networks
+		"(?!(?:10|127)(?:\\.\\d{1,3}){3})" +
+		"(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
+		"(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
+		// IP address dotted notation octets
+		// excludes loopback network 0.0.0.0
+		// excludes reserved space >= 224.0.0.0
+		// excludes network & broadcast addresses
+		// (first & last IP address of each class)
+		"(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
+		"(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
+		"(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
+		"|" +
+		// host & domain names, may end with dot
+		// can be replaced by a shortest alternative
+		// (?![-_])(?:[-\\w\\u00a1-\\uffff]{0,63}[^-_]\\.)+
+		"(?:" +
+		"(?:" +
+		"[a-z0-9\\u00a1-\\uffff]" +
+		"[a-z0-9\\u00a1-\\uffff_-]{0,62}" +
+		")?" +
+		"[a-z0-9\\u00a1-\\uffff]\\." +
+		")+" +
+		// TLD identifier name, may end with dot
+		"(?:[a-z\\u00a1-\\uffff]{2,}\\.?)" +
+		")" +
+		// port number (optional)
+		"(?::\\d{2,5})?" +
+		// resource path (optional)
+		"(?:[/?#]\\S*)?" +
+		"$",
+	"i"
+);
+
 // if someone requests the home page from a browser
 // (a GET request) give them the best home page
 // ever made
-app.get('/', function(req, res, next) {
-    res.send(`<title>mew - no-bullshit url shortening</title><pre>
+app.get("/", function(req, res, next) {
+	res.send(`<title>mew - no-bullshit url shortening</title><pre>
 mew - no-bullshit url shortening
 ================================
 
@@ -36,70 +82,110 @@ https://github.com/lilyshibe/mew
 });
 
 // this handles the actual link forwarding
-app.get('/:short', function(req, res, next) {
-    // grab the short url they're requesting
-    const { short } = req.params;
-    // create a new variable to store the url we redirect to
-    let longURL;
+app.get("/:short", function(req, res, next) {
+	// grab the short url they're requesting
+	const { short } = req.params;
+	// create a new variable to store the url we redirect to
+	let longURL;
 
-    // search the database for entries where the short url requested
-    // matches the short url in the database
-    db.from('urls').select('short', 'url').where('short', short).then((resp) => {
-        // grab the longer url from the first entry in those results
-        longURL = (resp[0].url)
-    }).then(() => {
-        // did it work? great! redirect.
-        res.status(302).redirect(longURL);
-    }).catch(() => {
-        // oh noes, something went wrong!
-        // most likely, the short url
-        // requested does not exist.
-        res.status(422).send(`<title>mew - not found</title><pre>
+	// search the database for entries where the short url requested
+	// matches the short url in the database
+	db.from("urls")
+		.select("short", "url")
+		.where("short", short)
+		.then(resp => {
+			// grab the longer url from the first entry in those results
+			longURL = resp[0].url;
+		})
+		.then(() => {
+			// did it work? great! redirect.
+			res.status(302).redirect(longURL);
+		})
+		.catch(() => {
+			// oh noes, something went wrong!
+			// most likely, the short url
+			// requested does not exist.
+			res.status(422).send(`<title>mew - not found</title><pre>
 mew - no-bullshit url shortening
 ================================
 
 Cannot GET /${short}</pre><style>*{background:black;color:lime;webkit-appearance:none;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`);
-    });
+		});
 });
 
 // this handles the creation of new short urls
-app.post('/', function(req, res, next) {
-    // tries to grab the url to shorten from the request
-    const url = req.body.shorten;
+app.post("/", function(req, res, next) {
+	// tries to grab the url to shorten from the request
+	const url = req.body.shorten;
 
-    // was there a url provided?
-    if (url) {
-        // log the request in the console
-        logger.log(`shorten request for ${url} from ${req.ip}`);
+	// was there a url provided?
+	if (url) {
+		// is it a valid url?
+		if (re_weburl.test(url)) {
+            // is it a duplicate?
+			db.from("urls")
+				.select()
+				.where("url", url)
+				.then(resp => {
+                    // url is not a duplicate!
+                    if (!Array.isArray(resp) || !resp.length) {
+						// log the request in the console
+						logger.log(`shorten request for ${url} from ${req.ip}`);
 
-        // generate a string of 6 readable characters.
-        // this will be the new short url
-        const short_url = random.generate({
-            readable: true,
-            length: 6
-        });
+						// generate a string of 6 readable characters.
+						// this will be the new short url
+						const short_url = random.generate({
+							readable: true,
+							length: 6
+						});
 
-        // insert the new entry into the database
-        db.table('urls').insert({
-            short: short_url,
-            url: url
-        }).then(() => {
-            // did it work? great! give the user a heads up, give them the
-            // short url, and log the success in console. :)
-            res.send(config.url + "/" + short_url + "\n");
-            logger.log(`shorten request for ${url} from ${req.ip} succeeded!`);
-        }).catch(() => {
-            // oh noes, error! most likely a database
-            // connection issue or something of that sort.
-            res.send("error");
-            logger.log(`shorten request for ${url} from ${req.ip} failed.`, "warn");
-        });
-    }
+						// insert the new entry into the database
+						db.table("urls")
+							.insert({
+								short: short_url,
+								url: url
+							})
+							.then(() => {
+								// did it work? great! give the user a heads up, give them the
+								// short url, and log the success in console. :)
+								res.send(config.url + "/" + short_url + "\n");
+								logger.log(
+									`shorten request for ${url} from ${req.ip} succeeded!`
+								);
+							})
+							.catch(() => {
+								// oh noes, error! most likely a database
+								// connection issue or something of that sort.
+								res.send("error");
+								logger.log(
+									`shorten request for ${url} from ${req.ip} failed.`,
+									"warn"
+								);
+							});
+                    }
+                    
+                    // dupe url!
+                    else {
+                        res.send(config.url + "/" + resp[0].short + "\n");
+						logger.log(
+							`shorten request for ${url} from ${req.ip} was a duplicate`
+						);
+                    }
+				});
+		}
 
-    // no url provided, can't shorten something that isn't there, invalid
-    else {
-        res.send(`invalid request!\n`);
-    }
+		// url invalid
+		else {
+			res.send(
+				"url invalid! be sure to add http:// or https:// if you haven't"
+			);
+		}
+	}
+
+	// no url provided, can't shorten something that isn't there, invalid
+	else {
+		res.send(`invalid request!\n`);
+	}
 });
 
 // start up our webpage!
