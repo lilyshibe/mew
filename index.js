@@ -21,7 +21,7 @@ HTTP POST request to / to shorten a url:
 
 like this site? clone it.
 https://github.com/lilyshibe/mew
-</pre>`);
+</pre><style>*{background:black;color:lime;}</style>`);
 });
 
 app.get('/:short', function(req, res, next) {
@@ -31,12 +31,9 @@ app.get('/:short', function(req, res, next) {
     db.from('urls').select('short', 'url').where('short', short).then((resp) => {
         longURL = (resp[0].url)
     }).then(() => {
-        if (longURL) {
-            res.status(302).redirect(longURL);
-        }
-        else {
-            res.status(404);
-        }
+        res.status(302).redirect(longURL);
+    }).catch(() => {
+        res.status(422).send(`<pre>Cannot GET /${short}</pre><style>*{background:black;color:lime;}</style>`)
     });
 })
 
@@ -63,7 +60,5 @@ app.post('/', function(req, res, next) {
         res.send(`invalid request!`);
     }
 });
-
-
 
 app.listen(80, () => console.log(`started on port 80`));
