@@ -4,6 +4,7 @@ const random = require('randomstring');
 const db = require('knex')(config.database);
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const logger = require('./logger.js');
 
 const app = express();
 require('./database/db.js')(db);
@@ -48,7 +49,7 @@ app.post('/', function(req, res, next) {
     const url = req.body.shorten;
 
     if (url) {
-        console.log("got shorten request for " + url);
+        logger.log(`shorten request for ${url} from ${req.ip}`);
 
         const short_url = random.generate({
             readable: true,
@@ -60,6 +61,10 @@ app.post('/', function(req, res, next) {
             url: url
         }).then(() => {
             res.send(config.url + "/" + short_url + "\n");
+            logger.log(`shorten request for ${url} from ${req.ip} succeeded!`);
+        }).catch(() => {
+            res.send("error");
+            logger.log(`shorten request for ${url} from ${req.ip} failed.`, "warn");
         });
     }
 
