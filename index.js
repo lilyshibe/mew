@@ -12,9 +12,6 @@ const http = require("http");
 const app = express(); // create the express app
 require("./database/db.js")(db); // import the database logic
 
-// this makes the HTTPS redirecting work
-app.enable('trust proxy');
-
 // this is middleware for express that allows POST
 // (the method this app uses for passing information)
 // variables to be easily accessed.
@@ -204,20 +201,16 @@ app.post("/", function(req, res, next) {
 });
 
 // start up our webpage!
-http.createServer(app).listen(80, () => {
-	logger.log(`HTTP started on port 80`, "ready");
-});
 
 if (config.usehttps) {
-	app.use(function(req, res, next) {
-		if (req.secure) {
-			// request was via https, so do no special handling
-			next();
-		} else {
-			// request was via http, so redirect to https
-			res.redirect("https://" + req.headers.host + req.url);
-		}
-	});
+	http
+		.createServer(function(req, res) {
+			res.writeHead(307, {
+				Location: "https://" + req.headers["host"] + req.url
+			});
+			res.end();
+		})
+		.listen(80);
 
 	https
 		.createServer(
@@ -231,6 +224,10 @@ if (config.usehttps) {
 		.listen(443, () => {
 			logger.log(`HTTPS started on port 443`, "ready");
 		});
+} else {
+	http.createServer(app).listen(80, () => {
+		logger.log(`HTTP started on port 80`, "ready");
+	});
 }
 
 // app.listen(80, () => logger.log(`started on port 80`, "ready"));
