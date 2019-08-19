@@ -17,6 +17,10 @@ mew - no-bullshit url shortening
 
 HTTP POST request to / to shorten a url:
     curl -d 'shorten=https://example.com/super/long/url/oh/no' ${config.url}
+
+
+like this site? clone it.
+https://github.com/lilyshibe/mew
 </pre>`);
 });
 
