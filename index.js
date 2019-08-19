@@ -210,7 +210,9 @@ if (config.usehttps) {
 			});
 			res.end();
 		})
-		.listen(80);
+		.listen(80, () => {
+			logger.log(`HTTP redirect server started on port 80`, "ready");
+		});
 
 	https
 		.createServer(
