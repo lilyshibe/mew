@@ -80,7 +80,9 @@ HTTP POST request to / to shorten a url:
     curl -d 'shorten=https://example.com/super/long/url/oh/no' ${config.url}
 
 bash alias for easy & quick shortening:
-    echo 'short() { curl -d"shorten=$1" ${config.url} ; }' > ~/.bashrc && source ~/.bashrc
+    echo 'short() { curl -d"shorten=$1" ${
+			config.url
+		} ; }' > ~/.bashrc && source ~/.bashrc
 
 alternatively, put the url here:
 </pre>
@@ -199,12 +201,17 @@ app.post("/", function(req, res, next) {
 });
 
 // start up our webpage!
-
-http.createServer(app).listen(80, () => {
-	logger.log(`HTTP started on port 80`, "ready");
-});
-
 if (config.usehttps) {
+	app.use(function(req, res, next) {
+		if (req.secure) {
+			// request was via https, so do no special handling
+			next();
+		} else {
+			// request was via http, so redirect to https
+			res.redirect("https://" + req.headers.host + req.url);
+		}
+	});
+
 	https
 		.createServer(
 			{
@@ -217,6 +224,10 @@ if (config.usehttps) {
 		.listen(443, () => {
 			logger.log(`HTTPS started on port 443`, "ready");
 		});
+} else {
+	http.createServer(app).listen(80, () => {
+		logger.log(`HTTP started on port 80`, "ready");
+	});
 }
 
 // app.listen(80, () => logger.log(`started on port 80`, "ready"));
