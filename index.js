@@ -24,7 +24,7 @@ alternatively, put the url here:
 <pre>
 like this site? clone it.
 https://github.com/lilyshibe/mew
-</pre><style>*{background:black;color:lime;}</style>`);
+</pre><style>*{background:black;color:lime;webkit-appearance:none;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`);
 });
 
 app.get('/:short', function(req, res, next) {
@@ -36,7 +36,7 @@ app.get('/:short', function(req, res, next) {
     }).then(() => {
         res.status(302).redirect(longURL);
     }).catch(() => {
-        res.status(422).send(`<pre>Cannot GET /${short}</pre><style>*{background:black;color:lime;}</style>`)
+        res.status(422).send(`<pre>Cannot GET /${short}</pre><style>*{background:black;color:lime;webkit-appearance:none;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`)
     });
 })
 
