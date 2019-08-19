@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // (a GET request) give them the best home page
 // ever made
 app.get('/', function(req, res, next) {
-    res.send(`<pre>
+    res.send(`<title>mew - no-bullshit url shortening</title><pre>
 mew - no-bullshit url shortening
 ================================
 
@@ -54,7 +54,7 @@ app.get('/:short', function(req, res, next) {
         // oh noes, something went wrong!
         // most likely, the short url
         // requested does not exist.
-        res.status(422).send(`<pre>
+        res.status(422).send(`<title>mew - not found</title><pre>
 mew - no-bullshit url shortening
 ================================
 
