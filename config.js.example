@@ -1,0 +1,11 @@
+module.exports = {
+    // the URL to your site
+    url: "localhost",
+    
+    // don't fuck with this unless you really know what youre doing
+    database: {
+        client: 'sqlite3',
+        connection: { filename: './database/db' },
+        useNullAsDefault: true
+    }
+}
