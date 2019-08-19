@@ -79,6 +79,9 @@ mew - no-bullshit url shortening
 HTTP POST request to / to shorten a url:
     curl -d 'shorten=https://example.com/super/long/url/oh/no' ${config.url}
 
+bash alias for easy & quick shortening:
+    echo 'short() { curl -d"shorten=$1" ${config.url} ; }' > ~/.bashrc && source ~/.bashrc
+
 alternatively, put the url here:
 </pre>
 <form method="post" action="/"><input type="text" name="shorten"><input type="submit" value="shorten"></form>
