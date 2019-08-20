@@ -203,17 +203,6 @@ app.post("/", function(req, res, next) {
 // start up our webpage!
 
 if (config.usehttps) {
-	http
-		.createServer(function(req, res) {
-			res.writeHead(307, {
-				Location: "https://" + req.headers["host"] + req.url
-			});
-			res.end();
-		})
-		.listen(80, () => {
-			logger.log(`HTTP redirect server started on port 80`, "ready");
-		});
-
 	https
 		.createServer(
 			{
@@ -226,7 +215,22 @@ if (config.usehttps) {
 		.listen(443, () => {
 			logger.log(`HTTPS started on port 443`, "ready");
 		});
-} else {
+}
+
+if (config.httpsredirect) {
+	http
+		.createServer(function(req, res) {
+			res.writeHead(307, {
+				Location: "https://" + req.headers["host"] + req.url
+			});
+			res.end();
+		})
+		.listen(80, () => {
+			logger.log(`HTTP redirect server started on port 80`, "ready");
+		});
+}
+
+else {
 	http.createServer(app).listen(80, () => {
 		logger.log(`HTTP started on port 80`, "ready");
 	});

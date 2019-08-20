@@ -4,6 +4,7 @@ module.exports = {
 
     // https settings
     usehttps: true,
+    httpsredirect: true,
 
     httpskey: "path/to/key",
     httpscert: "path/to/cert",
