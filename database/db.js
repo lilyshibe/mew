@@ -9,7 +9,7 @@ let init = function(db) {
 					table.string("short");
 					table.string("url");
 					table.string("ip");
-					table.timestamp("timestamp").defaultTo(knex.fn.now());
+					table.timestamp("timestamp").defaultTo(db.fn.now());
 				})
 				.then(() => {
 					logger.log(`urls table ready`, "ready");
@@ -27,7 +27,7 @@ let init = function(db) {
 					db.schema.hasColumn("urls", "timestamp").then(exists => {
 						if (!exists)
 							db.schema.table("urls", table => {
-								table.timestamp("timestamp").defaultTo(knex.fn.now());
+								table.timestamp("timestamp").defaultTo(db.fn.now());
 							});
 					});
 				})
@@ -43,7 +43,7 @@ let init = function(db) {
 					table.increments("id").primary();
 					table.string("short");
 					table.string("ip");
-					table.timestamp("timestamp").defaultTo(knex.fn.now());
+					table.timestamp("timestamp").defaultTo(db.fn.now());
 				})
 				.then(() => {
 					logger.log(`duplicates table ready`, "ready");
