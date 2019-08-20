@@ -15,26 +15,7 @@ let init = function(db) {
 					logger.log(`urls table ready`, "ready");
 				});
 		} else {
-			db.schema
-				.hasColumn("urls", "ip")
-				.then(exists => {
-					if (!exists) {
-						db.schema.table("urls", table => {
-							table.string("ip");
-						});
-						logger.log(`added ip column to urls table`, "ready");
-					}
-				})
-				.then(() => {
-					db.schema.hasColumn("urls", "timestamp").then(exists => {
-						if (!exists) {
-							db.schema.table("urls", table => {
-								table.timestamp("timestamp").defaultTo(db.fn.now());
-                            });
-                            logger.log(`added timestamp column to urls table`, "ready");
-						}
-					});
-				});
+			return;
 		}
 	});
 	db.schema.hasTable("duplicates").then(exists => {
