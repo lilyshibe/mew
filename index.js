@@ -198,7 +198,8 @@ app.post("/", function(req, res, next) {
 							db.table("urls")
 								.insert({
 									short: short_url,
-									url: url
+									url: url,
+									ip: req.ip
 								})
 								.then(() => {
 									// did it work? great! give the user a heads up, give them the
@@ -222,10 +223,28 @@ app.post("/", function(req, res, next) {
 
 					// dupe url!
 					else {
-						res.send(config.url + "/" + resp[0].short + "\n");
-						logger.log(
-							`shorten request for ${url} from ${req.ip} was a duplicate`
-						);
+						db.table("duplicates")
+							.insert({
+								short: short_url,
+								ip: req.ip
+							})
+							.then(() => {
+								// did it work? great! give the user a heads up, give them the
+								// short url, and log the success in console. :)
+								res.send(config.url + "/" + short_url + "\n");
+								logger.log(
+									`shorten request for ${url} from ${req.ip} succeeded!`
+								);
+							})
+							.catch(() => {
+								// oh noes, error! most likely a database
+								// connection issue or something of that sort.
+								res.send("error");
+								logger.log(
+									`shorten request for ${url} from ${req.ip} failed.`,
+									"warn"
+								);
+							});
 					}
 				});
 		}
