@@ -225,24 +225,15 @@ app.post("/", function(req, res, next) {
 					else {
 						db.table("duplicates")
 							.insert({
-								short: short_url,
+								short: resp[0].short,
 								ip: req.ip
 							})
 							.then(() => {
 								// did it work? great! give the user a heads up, give them the
 								// short url, and log the success in console. :)
-								res.send(config.url + "/" + short_url + "\n");
+								res.send(config.url + "/" + resp[0].short + "\n");
 								logger.log(
-									`shorten request for ${url} from ${req.ip} succeeded!`
-								);
-							})
-							.catch(() => {
-								// oh noes, error! most likely a database
-								// connection issue or something of that sort.
-								res.send("error");
-								logger.log(
-									`shorten request for ${url} from ${req.ip} failed.`,
-									"warn"
+									`shorten request for ${url} from ${req.ip} was a duplicate`
 								);
 							});
 					}
