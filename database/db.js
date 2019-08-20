@@ -30,8 +30,8 @@ let init = function(db) {
 						if (!exists) {
 							db.schema.table("urls", table => {
 								table.timestamp("timestamp").defaultTo(db.fn.now());
-								logger.log(`added timestamp column to urls table`, "ready");
-							});
+                            });
+                            logger.log(`added timestamp column to urls table`, "ready");
 						}
 					});
 				});
