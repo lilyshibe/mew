@@ -3,7 +3,7 @@
     <img src="https://i.imgur.com/PCMCOBP.png" width="100">
     <br><br>
     <p>no-bullshit url shortening</p>
-    <p><a href="https://mew.qc.to">homepage</a> | <a href="https://mew.qc.to/A2Wagu">trello</a></p>
+    <p><a href="https://mew.qc.to">homepage</a> | <a href="https://mew.qc.to/dbJWgh">trello</a></p>
     <img src="https://img.shields.io/github/license/lilyshibe/mew.svg"> 
 	<img src="https://img.shields.io/github/repo-size/lilyshibe/mew.svg">
 	<img src="https://img.shields.io/david/lilyshibe/mew.svg">
