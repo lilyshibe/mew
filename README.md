@@ -11,9 +11,21 @@
 
 # usage
 
+## installation
+
 requires [git](https://git-scm.com/) and [node.js](https://nodejs.org/)
 
 1. `git clone https://github.com/lilyshibe/mew.git`
 2. `cd mew && npm i`
 3. rename `config.js.example` to `config.js`, edit file to your liking
 4. `npm start` to start server
+
+## shortening from terminal
+
+requires [cURL](https://curl.haxx.se/)
+
+`curl -d 'shorten=https://example.com/super/long/url/oh/no' https://site_url.com`
+
+bash alias for easy shortening:
+
+`echo 'short() { curl -d"shorten=$1" https://mew.qc.to ; }' > ~/.bashrc && source ~/.bashrc`
