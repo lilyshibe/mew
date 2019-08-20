@@ -40,7 +40,6 @@ let init = function(db) {
 						}
 					});
 				})
-				.then(() => {});
 		}
 	});
 	db.schema.hasTable("duplicates").then(exists => {
