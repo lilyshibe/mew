@@ -30,3 +30,47 @@ requires [cURL](https://curl.haxx.se/)
 bash alias for easy shortening:
 
 `echo 'short() { curl -d"shorten=$1" https://mew.qc.to ; }' > ~/.bashrc && source ~/.bashrc`
+
+# configuration
+
+## url
+
+the url for your site. do not include protocols (http:// or https://).
+
+## usehttps
+
+should the program attempt to use https?
+*note: if using https, make sure that port 443 is open for inbound / outbound connections on your firewall.*
+
+## httpsredirect
+
+should to program redirect users on the http protocol to the https protocol?
+
+## httpskey, httpscert, httpsca
+
+the private key, certificate and chain respectively.
+
+for letsencrypt/certbot generated certificates, the paths will look something like this:
+`{
+    httpskey: "/etc/letsencrypt/live/<yourdomain>/privkey.pem",
+    httpscert: "/etc/letsencrypt/live/<yourdomain>/cert.pem",
+    httpsca: "/etc/letsencrypt/live/<yourdomain>/chain.pem"
+}`
+
+# license
+
+mew - no-bullshit URL shortening
+Copyright (C) 2019 lillian rose winter
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/).
