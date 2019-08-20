@@ -162,6 +162,7 @@ app.post("/", function(req, res, next) {
 									req.ip
 								} - cannot shorten self`
 							);
+							res.send(`invalid shorten request - cannot shorten self`);
 						} else {
 							// log the request in the console
 							logger.log(`shorten request for ${url} from ${req.ip}`);
