@@ -1,5 +1,5 @@
 module.exports = {
-    // the URL to your site
+    // the URL to your site, without protocol
     url: "localhost",
 
     // https settings

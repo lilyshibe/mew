@@ -8,9 +8,18 @@ const fs = require("fs");
 const logger = require("./logger.js");
 const https = require("https");
 const http = require("http");
+const URI = require("uri-js");
 
 const app = express(); // create the express app
 require("./database/db.js")(db); // import the database logic
+
+let protocolToUse;
+
+if (config.usehttps) {
+	protocolToUse = "https://";
+} else {
+	protcolToUse = "http://";
+}
 
 // this is middleware for express that allows POST
 // (the method this app uses for passing information)
@@ -72,17 +81,20 @@ var re_weburl = new RegExp(
 // (a GET request) give them the best home page
 // ever made
 app.get("/", function(req, res, next) {
-	res.send(`<title>mew - no-bullshit url shortening</title><pre>
+	res.send(
+		`<title>mew - no-bullshit url shortening</title><pre>
 mew - no-bullshit url shortening
 ================================
 
 HTTP POST request to / to shorten a url:
-    curl -d 'shorten=https://example.com/super/long/url/oh/no' ${config.url}
+    curl -d 'shorten=https://example.com/super/long/url/oh/no' ` +
+			protocolToUse +
+			`${config.url}
 
 bash alias for easy & quick shortening:
-    echo 'short() { curl -d"shorten=$1" ${
-			config.url
-		} ; }' > ~/.bashrc && source ~/.bashrc
+    echo 'short() { curl -d"shorten=$1" ` +
+			protocolToUse +
+			`${config.url} ; }' > ~/.bashrc && source ~/.bashrc
 
 alternatively, put the url here:
 </pre>
@@ -90,7 +102,8 @@ alternatively, put the url here:
 <pre>
 like this site? clone it.
 https://github.com/lilyshibe/mew
-</pre><style>*{background:black;color:lime;appearance:none;-moz-appearance:none;-webkit-appearance:none;}input{border:1px solid lime !important;border-radius:none;}input[type=submit]{border:1px solid white;padding:1px 5px;margin-left:10px;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`);
+</pre><style>*{background:black;color:lime;appearance:none;-moz-appearance:none;-webkit-appearance:none;}input{border:1px solid lime !important;border-radius:none;}input[type=submit]{border:1px solid white;padding:1px 5px;margin-left:10px;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`
+	);
 });
 
 // this handles the actual link forwarding
@@ -141,39 +154,49 @@ app.post("/", function(req, res, next) {
 				.then(resp => {
 					// url is not a duplicate!
 					if (!Array.isArray(resp) || !resp.length) {
-						// log the request in the console
-						logger.log(`shorten request for ${url} from ${req.ip}`);
+						// is the url's host the same as the site's?
+						if (URI.parse(url).host == config.url) {
+							// yes it is
+							logger.log(
+								`invalid shorten request for ${url} from ${
+									req.ip
+								} - cannot shorten self`
+							);
+						} else {
+							// log the request in the console
+							logger.log(`shorten request for ${url} from ${req.ip}`);
 
-						// generate a string of 6 readable characters.
-						// this will be the new short url
-						const short_url = random.generate({
-							readable: true,
-							length: 6
-						});
-
-						// insert the new entry into the database
-						db.table("urls")
-							.insert({
-								short: short_url,
-								url: url
-							})
-							.then(() => {
-								// did it work? great! give the user a heads up, give them the
-								// short url, and log the success in console. :)
-								res.send(config.url + "/" + short_url + "\n");
-								logger.log(
-									`shorten request for ${url} from ${req.ip} succeeded!`
-								);
-							})
-							.catch(() => {
-								// oh noes, error! most likely a database
-								// connection issue or something of that sort.
-								res.send("error");
-								logger.log(
-									`shorten request for ${url} from ${req.ip} failed.`,
-									"warn"
-								);
+							// generate a string of 6 readable characters.
+							// this will be the new short url
+							const short_url = random.generate({
+								readable: true,
+								length: 6
 							});
+
+							// insert the new entry into the database
+							db.table("urls")
+								.insert({
+									short: short_url,
+									url: url
+								})
+								.then(() => {
+									// did it work? great! give the user a heads up, give them the
+									// short url, and log the success in console. :)
+									res.send(config.url + "/" + short_url + "\n");
+									logger.log(
+										`shorten request for ${url} from ${req.ip} succeeded!`
+									);
+								})
+								.catch(() => {
+									// oh noes, error! most likely a database
+									// connection issue or something of that sort.
+									res.send("error");
+									logger.log(
+										`shorten request for ${url} from ${req.ip} failed.`,
+										"warn"
+									);
+								});
+						}
 					}
 
 					// dupe url!
@@ -191,6 +214,7 @@ app.post("/", function(req, res, next) {
 			res.send(
 				"url invalid! be sure to add http:// or https:// if you haven't"
 			);
+			logger.log(`invalid shorten request for ${url} from ${req.ip}`);
 		}
 	}
 
@@ -228,9 +252,7 @@ if (config.httpsredirect) {
 		.listen(80, () => {
 			logger.log(`HTTP redirect server started on port 80`, "ready");
 		});
-}
-
-else {
+} else {
 	http.createServer(app).listen(80, () => {
 		logger.log(`HTTP started on port 80`, "ready");
 	});
