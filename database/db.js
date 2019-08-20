@@ -18,22 +18,29 @@ let init = function(db) {
 			db.schema
 				.hasColumn("urls", "ip")
 				.then(exists => {
-					if (!exists)
+					var logged = false;
+					if (!exists) {
 						db.schema.table("urls", table => {
 							table.string("ip");
 						});
+						logger.log(`urls table updated`, "ready");
+						logged = true;
+					}
 				})
 				.then(() => {
 					db.schema.hasColumn("urls", "timestamp").then(exists => {
-						if (!exists)
+						if (!exists) {
 							db.schema.table("urls", table => {
 								table.timestamp("timestamp").defaultTo(db.fn.now());
 							});
+							if (!logged) {
+								logger.log(`urls table updated`, "ready");
+								logged = true;
+							}
+						}
 					});
 				})
-				.then(() => {
-					logger.log(`urls table updated`, "ready");
-				});
+				.then(() => {});
 		}
 	});
 	db.schema.hasTable("duplicates").then(exists => {
