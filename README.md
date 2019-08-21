@@ -31,6 +31,12 @@ bash alias for easy shortening:
 
 `echo 'short() { curl -d"shorten=$1" https://mew.qc.to ; }' > ~/.bashrc && source ~/.bashrc`
 
+# features
+
+* easily usable from cURL
+* very small (see top of readme for repo size)
+* minimal setup for installation
+
 # configuration
 
 ## url
