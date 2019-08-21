@@ -21,6 +21,15 @@ requires [git](https://git-scm.com/) and [node.js](https://nodejs.org/)
 3. rename `config.js.example` to `config.js`, edit file to your liking
 4. `npm start` to start server
 
+## HTTPS setup
+
+requires [certbot](https://certbot.eff.org/)
+
+1. run `certbot certonly --manual`
+2. run mew with https turned off, and place the acme-challenge files in /static (mew is automatically configured to serve static files from that directory)
+3. configure the httpskey, httpscert and httpsca variables in config
+4. turn https on
+
 ## shortening from terminal
 
 requires [cURL](https://curl.haxx.se/)
