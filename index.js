@@ -33,12 +33,13 @@ const URI = require("uri-js");
 const app = express(); // create the express app
 require("./database/db.js")(db); // import the database logic
 
+// figure out the protocol to return with config.url
 let protocolToUse;
 
 if (config.usehttps) {
 	protocolToUse = "https://";
 } else {
-	protcolToUse = "http://";
+	protocolToUse = "http://";
 }
 
 // this is middleware for express that allows POST
@@ -204,7 +205,7 @@ app.post("/", function(req, res, next) {
 								.then(() => {
 									// did it work? great! give the user a heads up, give them the
 									// short url, and log the success in console. :)
-									res.send(config.url + "/" + short_url + "\n");
+									res.send(protocolToUse + config.url + "/" + short_url + "\n");
 									logger.log(
 										`shorten request for ${url} from ${req.ip} succeeded!`
 									);
@@ -231,7 +232,9 @@ app.post("/", function(req, res, next) {
 							.then(() => {
 								// did it work? great! give the user a heads up, give them the
 								// short url, and log the success in console. :)
-								res.send(config.url + "/" + resp[0].short + "\n");
+								res.send(
+									protocolToUse + config.url + "/" + resp[0].short + "\n"
+								);
 								logger.log(
 									`shorten request for ${url} from ${req.ip} was a duplicate`
 								);
