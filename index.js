@@ -123,7 +123,7 @@ alternatively, put the url here:
 <pre>
 like this site? clone it.
 https://github.com/lilyshibe/mew
-</pre><style>*{font-size:2vw;background:black;color:lime;appearance:none;-moz-appearance:none;-webkit-appearance:none;}input{border:1px solid lime !important;border-radius:none;}input[type=submit]{border:1px solid white;padding:1px 5px;margin-left:10px;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`
+</pre><style>*{font-size:1.5vw;background:black;color:lime;appearance:none;-moz-appearance:none;-webkit-appearance:none;}input{border:1px solid lime !important;border-radius:none;}input[type=submit]{border:1px solid white;padding:1px 5px;margin-left:10px;}pre{white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;</style><meta name="viewport" content="width=device-width, initial-scale=1">`
 	);
 });
 
